@@ -1,0 +1,171 @@
+# Where every field comes from, and under what licence. Two sources with
+# different licences are joined here, so this is field by field rather than
+# file by file.
+sources:
+  - name: OpenStreetMap
+    through: |
+      japan-260831.osm.pbf, Japan cut from the planet file of 2026-08-31 and
+      read object by object with osmium. Nothing was fetched from the live API.
+
+      No database is involved. Loading the extract with osm2pgsql would cost
+      the two most important keys: that tool promotes `name` and `brand` to
+      columns of their own, so an hstore column holds every name key except
+      those two. The Tokyo dataset was built that way once and had to be
+      corrected.
+    file: japan-260831.osm.pbf
+    md5: 2f803a54de5bdeb5ecbbb740c9b5100d
+    nodes: 318225406
+    ways: 45679976
+    relations: 241943
+    osm_base: 2026-08-30T23:50:59Z
+    upstream: https://planet.openstreetmap.org/pbf/planet-260831.osm.pbf
+    upstream_md5: c67437924cf55de40e8708c7192f354d
+    extent:
+      name: 日本 / Japan
+      rule: the administrative relation at admin_level=2 with ISO3166-1=JP
+      derived_from: |
+        The same planet file as the data. Not Natural Earth, whose 10m
+        coastline runs inland of the reclaimed land around Tokyo Bay and drops
+        about a quarter of the Tokyo wards' area; the same class of error on a
+        country outline would remove the ports and waterfronts, which is where
+        a great many branded features are. Not a boundary of another date
+        either: one drawn earlier once dropped a way created the day before a
+        snapshot and broke a ward's ring.
+      parts: 24
+      bounds: [122.7142, 20.2146, 154.2055, 45.7112]
+      checked: |
+        Tokyo, Naha, Sapporo, Fukuoka, Yonaguni, Minamitorishima and
+        Chichijima fall inside it; Seoul, Busan, Vladivostok and Taipei fall
+        outside.
+      boundary_file: japan_osm_boundary.geojson
+    licence: ODbL-1.0
+    licence_url: https://www.openstreetmap.org/copyright
+    licence_note: |
+      The copyright page asks two things of anyone redistributing data derived
+      from OpenStreetMap, and they are separate: credit OpenStreetMap, and make
+      clear that the data is available under ODbL. Both are done in README.md
+      and in this file.
+    supplies:
+      - qid
+      - features
+      - every key under `osm`, which is every name key carried by a feature
+        tagged with that brand:wikidata, and how many features carry each
+        spelling
+
+  - name: Wikidata
+    through: |
+      wikidata-20260831-all.json.bz2, read once in a stream. The items taken
+      are the 101,873 that the extract above points at through any *:wikidata
+      key, plus every item carrying property P1282.
+    file: wikidata-20260831-all.json.bz2
+    bytes: 102943257005
+    md5: f99e3ee0778ffe1c3b54fa5dbc6ce395
+    sha1: b24eea0dee9f2fbe7ca70e6efe3209eb69bc48af
+    checksums_from: |
+      wikidata-20260831-md5sums.txt and -sha1sums.txt as the source publishes
+      them, not as computed locally. A local checksum matching a local file
+      proves nothing about what was downloaded.
+    verified: |
+      The copy that was read has md5 f99e3ee0778ffe1c3b54fa5dbc6ce395, computed
+      over the 102,943,257,005 bytes on disk and equal to the figure above. So
+      the dump that produced this file is the dump the source published, and
+      not a truncated or resumed download that happened to be the right length.
+    upstream: https://dumps.wikimedia.org/wikidatawiki/entities/20260831/
+    items_read: 121519241
+    items_kept: 105246
+    licence: CC0-1.0
+    licence_url: https://creativecommons.org/publicdomain/zero/1.0/
+    licence_note: |
+      Wikidata's licensing page says the CC0 applies to structured data in the
+      main, property and lexeme namespaces; text in other namespaces is
+      CC BY-SA 4.0. Everything taken here is structured data from the main
+      namespace, so CC0 is the right one, and the distinction is written down
+      because "Wikidata is CC0" is not true of the whole site.
+      Wikidata requires no attribution.
+      https://www.wikidata.org/wiki/Wikidata:Licensing
+    supplies:
+      - every key under `wikidata`: label, description, aliases, found
+
+same_day: |
+  Both sources are dated 2026-08-31. That is deliberate. A brand added to one
+  in September and to the other in October would show up here as the two
+  sources disagreeing, when the only difference is when each was read.
+
+licensing:
+  position: |
+    The file contains content derived from OpenStreetMap, so redistributing
+    the file means complying with ODbL-1.0. The Wikidata content is CC0 and
+    carries no conditions of its own; being placed beside ODbL content does
+    not put conditions on it, and being placed beside CC0 content does not
+    remove them from the OpenStreetMap side.
+  what_this_is_not: |
+    Not legal advice, and not a ruling on whether the join makes a Derivative
+    Database or a Collective Database under ODbL section 4.5. The two are
+    joined on a shared key into one record rather than merely shipped in one
+    archive, which is why the stricter reading is the one taken here.
+
+    That reading has not been checked against the ODbL legal text. The
+    OpenStreetMap copyright page does not draw the Derivative and Collective
+    distinction at all and points at the Open Data Commons legal code and the
+    OSMF licence page for it, and neither has been read. The position here is
+    the cautious one taken without reading them, which is a reason to treat it
+    as a starting point rather than as settled.
+    https://opendatacommons.org/licenses/odbl/1-0/
+    https://osmfoundation.org/wiki/Licence
+  separating_them: |
+    The two sides are in separate keys of every record, `osm` and `wikidata`,
+    so a reader who wants only the CC0 half can take it without inspecting the
+    values. Whether that extraction leaves ODbL behind is the reader's
+    judgement to make; this file's position is only that the whole is ODbL.
+  attribution: |
+    (c) OpenStreetMap contributors, available under the Open Database License.
+    https://www.openstreetmap.org/copyright
+
+environment:
+  image: docker/Dockerfile
+  base: debian:bookworm-slim@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171
+  python3: 3.11.2-1+b1
+  lbzip2: 2.5-2.3
+  osmium-tool: 1.15.0-1
+  note: |
+    The base is pinned by digest and not by tag, because bookworm-slim moves
+    and a digest does not. osmium's version is asserted after installation, so
+    apt resolving something else is a build failure. Debian drops old versions
+    from the archive, so these pins will stop resolving one day; that the build
+    then fails is the point of writing them down.
+
+    There is no database here and no network. The extract is a file, the dump
+    is a file, and neither source's live API is consulted; the compose service
+    runs with network_mode: none.
+  reproduced: |
+    data/brands.jsonl was built inside this image and outside it, from the same
+    extract and the same Wikidata file, and the two are byte for byte the same.
+    The host has osmium 1.16.0 and the image 1.15.0, so that also says the two
+    versions read these tags identically.
+
+    The dump pass read 121,519,241 items and kept 105,246.
+
+how_it_was_built: |
+  Three steps, in this order, all of them in src/ and none of them reaching
+  outside this repository by absolute path.
+
+    scripts/00_extract_bbox.sh   one pass over the planet file, a generous
+                             box around Japan, about 85 minutes
+    scripts/01_build_japan_boundary.py  the border, out of that same file
+    scripts/02_clip_japan.sh     the box down to the country
+    scripts/03_filter_branded.sh the objects carrying brand:wikidata
+    src/qids.py              the 101,873 Wikidata ids the extract points at,
+                             off every one of its *:wikidata keys
+    src/wikidata_osm_tags.py one pass over the dump, about an hour, keeping
+                             the items those ids name and the ones carrying
+                             P1282
+    src/build.py             the join, and the counting of spellings
+
+  The inputs are named by environment variable, EXTRACT and WIKIDATA_ITEMS, so
+  that the same code runs against a copy kept somewhere else. Rerunning the three steps
+  against the same two sources reproduces data/brands.jsonl byte for byte;
+  that was checked rather than assumed.
+
+code:
+  licence: MIT
+  covers: src/

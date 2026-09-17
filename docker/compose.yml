@@ -1,0 +1,25 @@
+# A name of its own. Without it compose takes the directory name, which is
+# `docker` here and `docker` in osm-tokyo23-src-2026-08 too, and each project
+# reports the other's containers as orphans and offers to remove them.
+name: osm-wikidata-brand-jp
+
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # No network. Nothing here fetches anything: the extract and the dump are
+    # both files, and the live APIs of neither source are consulted.
+    network_mode: none
+    environment:
+      EXTRACT: /extract/japan-260831.osm.pbf
+      WIKIDATA_ITEMS: /work/tmp/wikidata.jsonl
+    volumes:
+      - ..:/work
+      # The dump, read only and never decompressed: 96 GiB compressed is well
+      # over a terabyte open and there is not that much disk.
+      - ${WIKIDATA_DUMP_DIR:-/data/www/html/static/wikimedia/wikidata}:/dump:ro
+      # The extract, read only. It is 2.7 GB and lives outside the repository
+      # for that reason; EXTRACT points at wherever it is kept.
+      - ${EXTRACT_DIR:-/data/data/osm-jp-260831}:/extract:ro
+    command: ["sleep", "infinity"]

@@ -5,10 +5,17 @@ the name of every shop in those chains.
 
 1,859 brands, 172,852 features, 65,026 distinct spellings across 221 name keys.
 
-The twenty-three wards of Tokyo are a separate dataset,
-`osm-wikidata-brand-tokyo23`, and not a subset of a row here: its counts are
-counts of the wards. `7-ELEVEN` on 9,698 features is a fact about Japan and
-`7-ELEVEN` on 1,512 is a fact about those wards, and one file cannot say both.
+The data is on the Hugging Face Hub. This repository is how it was built.
+
+    https://huggingface.co/datasets/yuiseki/osm-wikidata-brand-jp
+
+The twenty-three wards of Tokyo are a separate dataset, and not a subset of a
+row here: its counts are counts of the wards.
+
+    https://huggingface.co/datasets/yuiseki/osm-wikidata-brand-tokyo23
+
+`7-ELEVEN` on 9,698 features is a fact about Japan and `7-ELEVEN` on 1,512 is
+a fact about those wards, and one file cannot say both.
 
 ## Where it comes from
 

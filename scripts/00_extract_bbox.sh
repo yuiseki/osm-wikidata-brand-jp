@@ -4,7 +4,7 @@
 # border is cut afterwards with a polygon derived from this same file, so no
 # boundary of another vintage is ever consulted.
 set -euo pipefail
-PLANET=${PLANET:-/www/html/static/openstreetmap/planet/planet-260831.osm.pbf}
+PLANET=${PLANET:-/sata_hdd_24tb/www/html/static/openstreetmap/planet/planet-260831.osm.pbf}
 WORK=${WORK:-/data/data/osm-jp-260831}
 mkdir -p "$WORK"
 exec osmium extract \

@@ -18,7 +18,7 @@ services:
       - ..:/work
       # The dump, read only and never decompressed: 96 GiB compressed is well
       # over a terabyte open and there is not that much disk.
-      - ${WIKIDATA_DUMP_DIR:-/data/www/html/static/wikimedia/wikidata}:/dump:ro
+      - ${WIKIDATA_DUMP_DIR:-/sata_hdd_24tb/www/html/static/wikimedia/wikidata}:/dump:ro
       # The extract, read only. It is 2.7 GB and lives outside the repository
       # for that reason; EXTRACT points at wherever it is kept.
       - ${EXTRACT_DIR:-/data/data/osm-jp-260831}:/extract:ro
